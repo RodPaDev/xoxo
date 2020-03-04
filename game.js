@@ -44,7 +44,7 @@ class Grid extends GameCanvas {
   regionMappers() {
     let x = this.columnSize;
     let y = this.columnSize;
-  
+
     for (let i = 0; i < this.columns ** 2; i++) {
       this.regions.push([x, y]);
       x += this.columnSize;
@@ -54,5 +54,61 @@ class Grid extends GameCanvas {
       }
     }
     return;
+  }
+}
+class Player extends GameCanvas {
+  constructor(name, symbol, isPlayerCPU = false, context, columnSize, regions) {
+    super(context, columnSize, regions);
+    this.name = name;
+    this.symbol = symbol;
+    this.isPlayerCPU = isPlayerCPU;
+    this.plays = [];
+    this.currentRegion = [];
+  }
+
+  drawSymbol() {
+    const halfColumn = this.columnSize / 2;
+    const x = this.currentRegion[0] - halfColumn;
+    const y = this.currentRegion[0] - halfColumn;
+
+    if (this.symbol.toLowerCase() === "o") {
+      this.context.beginPath();
+      this.context.arc(x, z, 20, 0, 2 * Math.PI);
+      this.context.stroke();
+      return;
+    }
+    this.context.beginPath()
+    this.context.moveTo(x - 20, y - 20);
+    this.context.lineTo(x + 20, y + 20);
+
+    this.context.moveTo(x + 20, y - 20);
+    this.context.lineTo(x - 20, y + 20);
+    this.context.stroke();
+  }
+}
+
+class Plays {
+  constructor(x_axis, y_axis) {
+    this.x_axis = x_axis;
+    this.y_axis = y_axis;
+    this.plays_count = 0;
+  }
+  // this could be replaced by incrementing the count each time it is played and changing it perhaps on the game level
+  count_plays() {
+    for (key in this.x_axis) {
+      this.plays_count += key.length;
+    }
+    for (key in this.y_axis) {
+      this.plays_count += key.length;
+    }
+    return;
+  }
+}
+
+class Game {
+  constructor(P1, P2) {
+    this.P1 = P1;
+    this.P2 = P2;
+    this.currentPlayer = null; //this will be set to either P1 or P2
   }
 }
