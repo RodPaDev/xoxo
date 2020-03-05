@@ -9,6 +9,7 @@ class Game {
     this.rounds = 0;
     this.currentPlayer = this.P1; //this will be set to either P1 or P2
     this.playedRegions = []
+    this.winner = null;
   }
 
   msg() {
@@ -16,19 +17,40 @@ class Game {
       this.msgElm.textContent = `XOXO it's a bloody draw`
       return;
     }
-    this.msgElm.textContent = `${this.currentPlayer.name}'s turn`
-  
+    if (this.winner !== null){
+      this.msgElm.textContent = `XOXO ${this.currentPlayer.name} won the game`
+      return;
+    }
+    this.msgElm.textContent = `${this.currentPlayer === this.P1 ? this.P2.name : this.P1.name}'s turn`
+  }
+
+  sum(arr) {
+    return arr.reduce((a,b) => a + b, 0)
   }
 
   checkWin(){
+    const x_axis_plays = this.currentPlayer.plays.x_axis
+    const y_axis_plays = this.currentPlayer.plays.y_axis
+
+    for(let axis_attribute in x_axis_plays){
+      if(this.sum(x_axis_plays[axis_attribute]) >= 798){
+        this.winner = this.currentPlayer;
+        return;
+      }
+    }
+
+    for(let axis_attribute in y_axis_plays){
+      if(this.sum(y_axis_plays[axis_attribute]) >= 798){
+        this.winner = this.currentPlayer;
+        return;
+      }
+    }
     
   }
 
   play(event) {
     let x = event.layerX;
     let y = event.layerY;
-    // console.log("x:", x, "\ny:", y);
-    
     for(let region of this.regions){
       if( x <= region[0] && y <= region[1]) {
         if(this.playedRegions.includes(region)){
@@ -37,12 +59,12 @@ class Game {
         
         this.playedRegions.push(region)
         this.rounds++
-        // console.log(`x: ${x}, y: ${y}\nIs in x: ${region[0]}, y: ${region[1]}`);
         this.currentPlayer.plays.collectAxisValues(region)
         this.currentPlayer.drawSymbol(region)
         console.log(this.currentPlayer.name, this.currentPlayer.plays)
-        this.currentPlayer = this.currentPlayer === this.P1 ? this.P2 : this.P1
+        this.checkWin()
         this.msg()
+        this.currentPlayer = this.currentPlayer === this.P1 ? this.P2 : this.P1
         return;
       }
     }
