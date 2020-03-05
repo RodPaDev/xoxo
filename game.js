@@ -20,28 +20,27 @@ class Game {
   
   }
 
-  checkIfAlreadyPlayed(region){
-    if(this.playedRegions.includes(region)){
-      return
-    }
+  checkWin(){
+    
   }
 
   play(event) {
     let x = event.layerX;
     let y = event.layerY;
-    console.log("x:", x, "\ny:", y);
+    // console.log("x:", x, "\ny:", y);
     
     for(let region of this.regions){
       if( x <= region[0] && y <= region[1]) {
         if(this.playedRegions.includes(region)){
           return
-        }else{
-          this.playedRegions.push(region)
         }
-
+        
+        this.playedRegions.push(region)
         this.rounds++
         // console.log(`x: ${x}, y: ${y}\nIs in x: ${region[0]}, y: ${region[1]}`);
+        this.currentPlayer.plays.collectAxisValues(region)
         this.currentPlayer.drawSymbol(region)
+        console.log(this.currentPlayer.name, this.currentPlayer.plays)
         this.currentPlayer = this.currentPlayer === this.P1 ? this.P2 : this.P1
         this.msg()
         return;
@@ -118,7 +117,7 @@ class Player {
     this.name = name;
     this.symbol = symbol;
     this.isPlayerCPU = isPlayerCPU;
-    this.plays = [];
+    this.plays = new Plays()
     this.currentRegion = [];
   }
 
@@ -145,22 +144,28 @@ class Player {
 }
 
 class Plays {
-  constructor(x_axis, y_axis) {
-    this.x_axis = x_axis;
-    this.y_axis = y_axis;
-    this.plays_count = 0;
+  constructor() {
+    this.x_axis = {};
+    this.y_axis = {};
   }
-  // this could be replaced by incrementing the count each time it is played and changing it perhaps on the game level
-  count_plays() {
-    for (key in this.x_axis) {
-      this.plays_count += key.length;
+  
+  collectAxisValues(vector) {
+    if(this.x_axis.hasOwnProperty(vector[0])){
+      this.x_axis[vector[0]].push(vector[1])
+    }else{
+      this.x_axis[vector[0]] = [];
+      this.x_axis[vector[0]].push(vector[1])
     }
-    for (key in this.y_axis) {
-      this.plays_count += key.length;
+
+    if(this.y_axis.hasOwnProperty(vector[1]))
+      this.y_axis[vector[1]].push(vector[0])
+    else{
+      this.y_axis[vector[1]] = [];
+      this.y_axis[vector[1]].push(vector[0])
     }
-    return;
   }
 }
+
 const canvas = document.getElementById("xoxo-canvas");
 const canvasInstance = new GameCanvas(400,400, canvas);
 const gridInstance = new Grid(canvasInstance.width, canvasInstance.context, 3)
